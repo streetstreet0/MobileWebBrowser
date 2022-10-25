@@ -29,7 +29,6 @@ public class Controller {
     private void setupHomeScreen(){
         activity.setContentView(R.layout.activity_main);
 
-       // Button btn = (Button) activity.findViewById(R.id.button);
         EditText input = (EditText) activity.findViewById(R.id.urlinput);
 
         WebViewClient myWebViewClient = new WebViewClient();
@@ -37,7 +36,6 @@ public class Controller {
         WebSettings webSettings = myWebViw.getSettings();
         webSettings.setJavaScriptEnabled(true);
         myWebViw.setWebViewClient(myWebViewClient);
-
 
         input.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
