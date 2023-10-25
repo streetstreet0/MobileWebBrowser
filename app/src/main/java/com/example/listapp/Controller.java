@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -42,11 +43,9 @@ public class Controller {
                 // If the event is a key-down event on the "enter" button
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
                     Log.d("INPUT","url entered: "+input.getText());
                     // Perform action on key press
-                    url = "http://www."+input.getText();
+                    url = "https://www."+input.getText();
 
                     history.push(url);
                     myWebViw.loadUrl(url);
@@ -56,6 +55,13 @@ public class Controller {
                 return false;
             }
         });
+
+        Button button = (Button) this.activity.findViewById(R.id.button);
+        button.setOnClickListener((view -> {
+            if (myWebViw.canGoBack()){
+                myWebViw.goBack();
+            }
+        }));
     }
 
     public void onBackPress(){
