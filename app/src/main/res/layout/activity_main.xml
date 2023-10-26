@@ -10,32 +10,73 @@
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/url"/>
+        android:layout_above="@+id/tabs"
+        android:layout_below="@+id/url">
+
+    </WebView>
 
     <LinearLayout
         android:id="@+id/url"
-        android:layout_width="388dp"
-        android:layout_height="64dp"
+        android:layout_width="446dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
         android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            android:text="Back" />
 
         <EditText
             android:id="@+id/urlinput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:layout_x="70dp"
+            android:layout_y="333dp"
             android:hint="@string/url"
             android:imeOptions="actionGo"
             android:inputType="text"
-            android:layout_weight="0.5"
             android:minHeight="48dp" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tabs"
+        android:layout_width="436dp"
+        android:layout_height="62dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="-7dp"
+        android:orientation="horizontal">
+
         <Button
-            android:id="@+id/button"
+            android:id="@+id/webButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.1"
-            android:text="Back" />
+            android:text="Browser" />
+
+        <Button
+            android:id="@+id/historyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            android:text="History" />
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            android:text="Settings" />
     </LinearLayout>
+
+
 
 </RelativeLayout>
