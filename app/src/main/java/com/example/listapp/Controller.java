@@ -7,12 +7,14 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.ClientCertRequest;
+import android.webkit.WebBackForwardList;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.util.Log;
 
 import java.util.Stack;
 
@@ -21,6 +23,7 @@ public class Controller {
     Stack<String> history;
     String url;
     WebView webView;
+    WebBackForwardList temp;
 
     public Controller(Activity activity){
         this.activity = activity;
@@ -34,16 +37,13 @@ public class Controller {
 
         WebViewClient myWebViewClient = new WebViewClient();
         webView = (WebView) activity.findViewById(R.id.webview);
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                input.setText(view.getUrl());
-            }
-        });
+
+        webView.copyBackForwardList();
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webView.setWebViewClient(myWebViewClient);
+
+        webView.copyBackForwardList();
 
         input.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -54,9 +54,11 @@ public class Controller {
                     // Perform action on key press
                     url = parseUrl(String.valueOf(input.getText()));
 
-                    history.push(url);
                     webView.loadUrl(url);
-                    input.setText(url);
+                    if (webView.copyBackForwardList().equals(temp)) {
+                        Log.d("TEST", "is same object");
+                    }
+//                    input.setText(url);
                     return true;
                 }
                 return false;
