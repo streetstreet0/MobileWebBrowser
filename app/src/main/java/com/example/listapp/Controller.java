@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.ClientCertRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -19,11 +20,10 @@ public class Controller {
     Activity activity;
     Stack<String> history;
     String url;
-    WebView myWebViw;
+    WebView webView;
 
     public Controller(Activity activity){
         this.activity = activity;
-        this.history = new Stack<>();
         setupHomeScreen();
     }
 
@@ -33,45 +33,107 @@ public class Controller {
         EditText input = (EditText) activity.findViewById(R.id.urlinput);
 
         WebViewClient myWebViewClient = new WebViewClient();
-        myWebViw = (WebView) activity.findViewById(R.id.webview);
-        WebSettings webSettings = myWebViw.getSettings();
+        webView = (WebView) activity.findViewById(R.id.webview);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                input.setText(view.getUrl());
+            }
+        });
+        WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        myWebViw.setWebViewClient(myWebViewClient);
+        webView.setWebViewClient(myWebViewClient);
 
         input.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 // If the event is a key-down event on the "enter" button
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                if ((event.getAction() == KeyEvent.ACTION_UP) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     Log.d("INPUT","url entered: "+input.getText());
                     // Perform action on key press
-                    url = "https://www."+input.getText();
+                    url = parseUrl(String.valueOf(input.getText()));
 
                     history.push(url);
-                    myWebViw.loadUrl(url);
-                    input.setText("");
+                    webView.loadUrl(url);
+                    input.setText(url);
                     return true;
                 }
                 return false;
             }
         });
 
-        Button button = (Button) this.activity.findViewById(R.id.button);
+        Button button = (Button) this.activity.findViewById(R.id.backButton);
         button.setOnClickListener((view -> {
-            if (myWebViw.canGoBack()){
-                myWebViw.goBack();
+            if (webView.canGoBack()){
+                webView.goBack();
             }
         }));
     }
 
     public void onBackPress(){
         Log.d("ONBACK","Loading previous site if exists");
-        if (myWebViw.canGoBack()){
-            myWebViw.goBack();
+        if (webView.canGoBack()){
+            webView.goBack();
         } else {
             Toast.makeText(activity, activity.getString(R.string.shut_down), Toast.LENGTH_LONG).show();
             activity.finish();
         }
     }
 
+    public String parseUrl(String url) {
+        if (url.startsWith("https:") || url.startsWith("http:")) {
+            return url;
+        }
+        else if (url.startsWith("www.")) {
+            return "https:/" + url;
+        }
+        else {
+            String searchUrl = url;
+            // need to encode all of the symbols before we can search
+            searchUrl = url.replace("%", "%25");
+            // need to replace % first
+            // ~ does not need to be encoded
+            searchUrl = searchUrl.replace("!", "%21");
+            searchUrl = searchUrl.replace("@", "%40");
+            searchUrl = searchUrl.replace("#", "%23");
+            searchUrl = searchUrl.replace("$", "%24");
+            searchUrl = searchUrl.replace("^", "%5E");
+            searchUrl = searchUrl.replace("&", "%26");
+            searchUrl = searchUrl.replace("*", "%2A");
+            searchUrl = searchUrl.replace("(", "%28");
+            searchUrl = searchUrl.replace(")", "%29");
+            // _ does not need encoding
+            searchUrl = searchUrl.replace("+", "%2B");
+            searchUrl = searchUrl.replace("`", "%60");
+            // - does not need encoding
+            searchUrl = searchUrl.replace("=", "%3D");
+            searchUrl = searchUrl.replace("{", "%7B");
+            searchUrl = searchUrl.replace("}", "7D");
+            searchUrl = searchUrl.replace("|", "%7C");
+            searchUrl = searchUrl.replace("[", "%5B");
+            searchUrl = searchUrl.replace("]", "%5D");
+            // note: || means \
+            // since \ has another meaning in java strings
+            searchUrl = searchUrl.replace("\\", "%5C");
+            searchUrl = searchUrl.replace(":", "%3A");
+            // note: \" means " inside a string
+            searchUrl = searchUrl.replace("\"", "%22");
+            searchUrl = searchUrl.replace(";", "%3B");
+            // note: \' means ' inside a string
+            searchUrl = searchUrl.replace("\'", "%27");
+            searchUrl = searchUrl.replace("<", "%3C");
+            searchUrl = searchUrl.replace(">", "%3E");
+            searchUrl = searchUrl.replace("?", "%3F");
+            searchUrl = searchUrl.replace(",", "%2C");
+            // . does not need encoding
+            searchUrl = searchUrl.replace("/", "%2F");
+            searchUrl = searchUrl.replace(" ", "%20");
+
+
+            // finally need to search it
+            searchUrl = "https:/www.duckduckgo.com/?t=ffab&q=" + searchUrl + "&ia=web";
+            return searchUrl;
+        }
+    }
 }
