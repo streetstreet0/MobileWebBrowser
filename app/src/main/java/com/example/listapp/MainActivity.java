@@ -16,6 +16,7 @@ import android.widget.Button;
 //import Gson;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.Stack;
 
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         controller = new Controller(this, savedInstanceState);
+        loadData();
     }
 
     public void onBackPressed(){
@@ -47,13 +49,13 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
     @Override
-    public void onDestroy() {
-        Log.d("DESTROY", "onDestroy");
+    public void onPause() {
+        Log.d("PAUSE", "onPause");
         controller.saveHistory();
 //        Log.d("TEST", "BEFORE");
         saveData();
 //        Log.d("TEST", "AFTER");
-        super.onDestroy();
+        super.onPause();
     }
 
     public void saveData() {
@@ -65,5 +67,24 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(HISTORY, json);
         editor.apply();
         Log.d("SAVE", "History Successfully Saved");
+    }
+
+    public void loadData() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        String gsonHistory = sharedPreferences.getString(HISTORY, "");
+
+        if (gsonHistory.length() == 0) {
+            Log.d("LOAD", "No History To Load");
+            return;
+        }
+
+        Gson gson = new Gson();
+        Stack<String> history = gson.fromJson(gsonHistory, Stack.class);
+        controller.loadHistory(history);
+        Log.d("LOAD", "History Successfully Loaded");
+
+        for (int i=0; i<history.size(); i++) {
+            Log.d("HISTORYLIST", i + ": " + history.get(i));
+        }
     }
 }
