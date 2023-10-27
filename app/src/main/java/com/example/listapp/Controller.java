@@ -40,12 +40,18 @@ public class Controller {
         else {
             this.instanceState = savedInstanceState;
         }
+        pastHistory = new Stack<String>();
         this.activity = activity;
         setupHomeScreen();
     }
 
     public Stack<String> getHistory() {
-        return  history;
+        saveHistory();
+        return history;
+    }
+
+    public void loadHistory(Stack<String> pastHistory) {
+        this.pastHistory = pastHistory;
     }
 
     private void setupHomeScreen(){
@@ -212,19 +218,18 @@ public class Controller {
     }
 
     public void saveHistory() {
-        Log.d("TEST", "saving history");
+        Log.d("SAVE", "saving history");
         webView.saveState(instanceState);
         history = new Stack<String>();
-        // re add the following when I manage to load the old history
-//        // need to have previous history at start
-//        for (int i=0; i<pastHistory.size(); i++) {
-//            history.add(pastHistory.get(i));
-//        }
+        // need to have previous history at start
+        for (int i=0; i<pastHistory.size(); i++) {
+            history.add(pastHistory.get(i));
+        }
         // now add the current session's history
         WebBackForwardList backForwardList = webView.copyBackForwardList();
         for (int i=0; i<backForwardList.getSize(); i++) {
             history.add(backForwardList.getItemAtIndex(i).getUrl());
         }
-        Log.d("TEST", "history saved");
+        Log.d("SAVE", "history saved");
     }
 }
