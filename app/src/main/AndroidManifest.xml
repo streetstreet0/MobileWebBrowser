@@ -16,6 +16,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".history_item"
+            android:exported="false" />
+        <activity
             android:name=".HistoryListActivity"
             android:exported="false" />
         <activity
