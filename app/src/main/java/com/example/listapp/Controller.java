@@ -14,8 +14,10 @@ import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 import android.util.Log;
 
@@ -206,6 +208,11 @@ public class Controller {
         activity.setContentView(R.layout.activity_history);
         currentView = TabWindow.HISTORY;
 
+        saveHistory();
+        ListView historyView = (ListView) activity.findViewById(R.id.historyList);
+        ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(activity, R.layout.activity_history, R.id.historyItem, history);
+        historyView.setAdapter(listAdapter);
+
         setupTabs();
     }
 
@@ -215,6 +222,12 @@ public class Controller {
         currentView = TabWindow.SETTINGS;
 
         setupTabs();
+    }
+
+    public void clearHistory() {
+        pastHistory = new Stack<String>();
+        webView.clearHistory();
+        saveHistory();
     }
 
     public void saveHistory() {
