@@ -6,44 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.example.listapp.WebViewPlus
+    <ListView
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/tabs"
-        android:layout_below="@+id/url">
+        android:layout_above="@+id/tabs"/>
 
-    </com.example.listapp.WebViewPlus>
-
-    <LinearLayout
-        android:id="@+id/url"
-        android:layout_width="446dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/backButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.1"
-            android:text="Back" />
-
-        <EditText
-            android:id="@+id/urlinput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:layout_x="70dp"
-            android:layout_y="333dp"
-            android:hint="@string/url"
-            android:imeOptions="actionGo"
-            android:inputType="text"
-            android:minHeight="48dp" />
-
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/tabs"
