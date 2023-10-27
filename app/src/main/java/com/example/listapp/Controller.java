@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.ClientCertRequest;
@@ -20,10 +21,12 @@ import java.util.Stack;
 
 public class Controller {
     Activity activity;
-    Stack<String> history;
+//    Stack<String> history;
     String url;
-    WebView webView;
-    WebBackForwardList temp;
+    String homePage = "https:www.duckduckgo.com";
+    EditText input;
+    WebViewPlus webView;
+    WebBackForwardList historyList;
 
     public Controller(Activity activity){
         this.activity = activity;
@@ -33,17 +36,38 @@ public class Controller {
     private void setupHomeScreen(){
         activity.setContentView(R.layout.activity_main);
 
-        EditText input = (EditText) activity.findViewById(R.id.urlinput);
+
+
+        input = (EditText) activity.findViewById(R.id.urlinput);
 
         WebViewClient myWebViewClient = new WebViewClient();
-        webView = (WebView) activity.findViewById(R.id.webview);
+        webView = (WebViewPlus) activity.findViewById(R.id.webview);
 
+        webView.addUrlInputText(input);
+        if (webView.canGoBack()) {
+            webView.loadUrl(historyList.getCurrentItem().getUrl());
+        }
+        else {
+            webView.loadUrl(homePage);
+        }
         webView.copyBackForwardList();
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webView.setWebViewClient(myWebViewClient);
+        historyList = webView.copyBackForwardList();
 
-        webView.copyBackForwardList();
+//        webView.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                super.onTouch(view, motionEvent);
+//                if (!webView.copyBackForwardList().equals(history)) {
+//                    history = webView.copyBackForwardList();
+//                    input.setText(webView.getUrl());
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
 
         input.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -55,10 +79,7 @@ public class Controller {
                     url = parseUrl(String.valueOf(input.getText()));
 
                     webView.loadUrl(url);
-                    if (webView.copyBackForwardList().equals(temp)) {
-                        Log.d("TEST", "is same object");
-                    }
-//                    input.setText(url);
+                    input.setText(url);
                     return true;
                 }
                 return false;
@@ -77,6 +98,7 @@ public class Controller {
         Log.d("ONBACK","Loading previous site if exists");
         if (webView.canGoBack()){
             webView.goBack();
+            input.setText(webView.getUrl());
         } else {
             Toast.makeText(activity, activity.getString(R.string.shut_down), Toast.LENGTH_LONG).show();
             activity.finish();
@@ -123,7 +145,7 @@ public class Controller {
             searchUrl = searchUrl.replace("\"", "%22");
             searchUrl = searchUrl.replace(";", "%3B");
             // note: \' means ' inside a string
-            searchUrl = searchUrl.replace("\'", "%27");
+            searchUrl = searchUrl.replace("'", "%27");
             searchUrl = searchUrl.replace("<", "%3C");
             searchUrl = searchUrl.replace(">", "%3E");
             searchUrl = searchUrl.replace("?", "%3F");
@@ -137,5 +159,32 @@ public class Controller {
             searchUrl = "https:/www.duckduckgo.com/?t=ffab&q=" + searchUrl + "&ia=web";
             return searchUrl;
         }
+    }
+
+    public void setupTabs() {
+        Button browserButton = (Button) activity.findViewById(R.id.webButton);
+        Button historyButton = (Button) activity.findViewById(R.id.historyButton);
+        Button settingsButton = (Button) activity.findViewById(R.id.settingsButton);
+
+        browserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.setContentView(R.layout.activity_main);
+            }
+        });
+
+        historyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.setContentView(R.layout.activity_main);
+            }
+        });
+
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.setContentView(R.layout.activity_main);
+            }
+        });
     }
 }
