@@ -215,10 +215,11 @@ public class Controller {
         Log.d("TEST", "saving history");
         webView.saveState(instanceState);
         history = new Stack<String>();
-        // need to have previous history at start
-        for (int i=0; i<pastHistory.size(); i++) {
-            history.add(pastHistory.get(i));
-        }
+        // re add the following when I manage to load the old history
+//        // need to have previous history at start
+//        for (int i=0; i<pastHistory.size(); i++) {
+//            history.add(pastHistory.get(i));
+//        }
         // now add the current session's history
         WebBackForwardList backForwardList = webView.copyBackForwardList();
         for (int i=0; i<backForwardList.getSize(); i++) {

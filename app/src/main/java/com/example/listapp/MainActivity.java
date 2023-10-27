@@ -36,13 +36,23 @@ public class MainActivity extends AppCompatActivity {
         controller.onBackPress();
     }
 
+//    @Override
+//    public void onStop() {
+//        Log.d("DESTROY", "onStop");
+//        controller.saveHistory();
+//        Log.d("TEST", "BEFORE");
+//        saveData();
+//        Log.d("TEST", "AFTER");
+//        super.onStop();
+//    }
+
     @Override
     public void onDestroy() {
         Log.d("DESTROY", "onDestroy");
         controller.saveHistory();
-        Log.d("TEST", "BEFORE");
+//        Log.d("TEST", "BEFORE");
         saveData();
-        Log.d("TEST", "AFTER");
+//        Log.d("TEST", "AFTER");
         super.onDestroy();
     }
 
@@ -54,6 +64,6 @@ public class MainActivity extends AppCompatActivity {
         String json = gson.toJson(controller.getHistory());
         editor.putString(HISTORY, json);
         editor.apply();
-        Log.d("TEST", "IT WORKED!!!");
+        Log.d("SAVE", "History Successfully Saved");
     }
 }
