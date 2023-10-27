@@ -2,6 +2,7 @@ package com.example.listapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.ClientCertRequest;
 import android.webkit.WebBackForwardList;
+import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -17,57 +19,62 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 public class Controller {
     Activity activity;
+    Bundle instanceState;
 //    Stack<String> history;
     String url;
     String homePage = "https:www.duckduckgo.com";
     EditText input;
     WebViewPlus webView;
     WebBackForwardList historyList;
+    TabWindow currentView;
 
-    public Controller(Activity activity){
+    public Controller(Activity activity, Bundle savedInstanceState){
+        if (savedInstanceState == null) {
+            this.instanceState = new Bundle();
+        }
+        else {
+            this.instanceState = savedInstanceState;
+        }
         this.activity = activity;
         setupHomeScreen();
+
     }
 
     private void setupHomeScreen(){
         activity.setContentView(R.layout.activity_main);
+        currentView = TabWindow.BROSWER;
 
-
+        setupTabs();
 
         input = (EditText) activity.findViewById(R.id.urlinput);
 
-        WebViewClient myWebViewClient = new WebViewClient();
         webView = (WebViewPlus) activity.findViewById(R.id.webview);
-
-        webView.addUrlInputText(input);
-        if (webView.canGoBack()) {
-            webView.loadUrl(historyList.getCurrentItem().getUrl());
+        webView.restoreState(instanceState);
+        if (webView.copyBackForwardList().getSize() != 0) {
+            Log.d("TEST ORIGINAL SIZE", String.valueOf(historyList.getSize()));
+            for (int i=0; i<historyList.getSize(); i++) {
+                webView.loadUrl(historyList.getCurrentItem().getUrl());
+                Log.d("TEST CURRENT SIZE", String.valueOf(webView.copyBackForwardList().getSize()));
+            }
         }
         else {
+            webView = (WebViewPlus) activity.findViewById(R.id.webview);
             webView.loadUrl(homePage);
         }
+
+        WebViewClient myWebViewClient = new WebViewClient();
+
+        webView.addUrlInputText(input);
         webView.copyBackForwardList();
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webView.setWebViewClient(myWebViewClient);
         historyList = webView.copyBackForwardList();
-
-//        webView.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View view, MotionEvent motionEvent) {
-//                super.onTouch(view, motionEvent);
-//                if (!webView.copyBackForwardList().equals(history)) {
-//                    history = webView.copyBackForwardList();
-//                    input.setText(webView.getUrl());
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
 
         input.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -162,29 +169,50 @@ public class Controller {
     }
 
     public void setupTabs() {
-        Button browserButton = (Button) activity.findViewById(R.id.webButton);
-        Button historyButton = (Button) activity.findViewById(R.id.historyButton);
-        Button settingsButton = (Button) activity.findViewById(R.id.settingsButton);
+        if (currentView != TabWindow.BROSWER) {
+            Button browserButton = (Button) activity.findViewById(R.id.webButton);
+            browserButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setupHomeScreen();
+                }
+            });
+        }
 
-        browserButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.setContentView(R.layout.activity_main);
-            }
-        });
+        if (currentView != TabWindow.HISTORY) {
+            Button historyButton = (Button) activity.findViewById(R.id.historyButton);
+            historyButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setupHistoryScreen();
+                }
+            });
+        }
 
-        historyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.setContentView(R.layout.activity_main);
-            }
-        });
+        if (currentView != TabWindow.SETTINGS) {
+            Button settingsButton = (Button) activity.findViewById(R.id.settingsButton);
+            settingsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setupSettingsScreen();
+                }
+            });
+        }
+    }
 
-        settingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.setContentView(R.layout.activity_main);
-            }
-        });
+    public void setupHistoryScreen() {
+        webView.saveState(instanceState);
+        activity.setContentView(R.layout.activity_history);
+        currentView = TabWindow.HISTORY;
+
+        setupTabs();
+    }
+
+    public void setupSettingsScreen() {
+        webView.saveState(instanceState);
+        activity.setContentView(R.layout.activity_history);
+        currentView = TabWindow.SETTINGS;
+
+        setupTabs();
     }
 }
