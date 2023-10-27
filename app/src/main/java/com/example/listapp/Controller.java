@@ -25,12 +25,12 @@ import java.util.Stack;
 public class Controller {
     Activity activity;
     Bundle instanceState;
-//    Stack<String> history;
+    Stack<String> history;
+    Stack<String> pastHistory; // used to refer to history before this session
     String url;
     String homePage = "https:www.duckduckgo.com";
     EditText input;
     WebViewPlus webView;
-    WebBackForwardList historyList;
     TabWindow currentView;
 
     public Controller(Activity activity, Bundle savedInstanceState){
@@ -42,7 +42,10 @@ public class Controller {
         }
         this.activity = activity;
         setupHomeScreen();
+    }
 
+    public Stack<String> getHistory() {
+        return  history;
     }
 
     private void setupHomeScreen(){
@@ -55,14 +58,7 @@ public class Controller {
 
         webView = (WebViewPlus) activity.findViewById(R.id.webview);
         webView.restoreState(instanceState);
-        if (webView.copyBackForwardList().getSize() != 0) {
-            Log.d("TEST ORIGINAL SIZE", String.valueOf(historyList.getSize()));
-            for (int i=0; i<historyList.getSize(); i++) {
-                webView.loadUrl(historyList.getCurrentItem().getUrl());
-                Log.d("TEST CURRENT SIZE", String.valueOf(webView.copyBackForwardList().getSize()));
-            }
-        }
-        else {
+        if (webView.copyBackForwardList().getSize() == 0) {
             webView = (WebViewPlus) activity.findViewById(R.id.webview);
             webView.loadUrl(homePage);
         }
@@ -74,7 +70,6 @@ public class Controller {
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webView.setWebViewClient(myWebViewClient);
-        historyList = webView.copyBackForwardList();
 
         input.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -214,5 +209,21 @@ public class Controller {
         currentView = TabWindow.SETTINGS;
 
         setupTabs();
+    }
+
+    public void saveHistory() {
+        Log.d("TEST", "saving history");
+        webView.saveState(instanceState);
+        history = new Stack<String>();
+        // need to have previous history at start
+        for (int i=0; i<pastHistory.size(); i++) {
+            history.add(pastHistory.get(i));
+        }
+        // now add the current session's history
+        WebBackForwardList backForwardList = webView.copyBackForwardList();
+        for (int i=0; i<backForwardList.getSize(); i++) {
+            history.add(backForwardList.getItemAtIndex(i).getUrl());
+        }
+        Log.d("TEST", "history saved");
     }
 }
