@@ -6,12 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
     <ListView
-        android:id="@+id/webview"
+        android:id="@+id/historyList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/tabs"/>
-
+        android:layout_above="@+id/tabs"
+        android:layout_marginBottom="-2dp"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/history_list" />
 
     <LinearLayout
         android:id="@+id/tabs"
