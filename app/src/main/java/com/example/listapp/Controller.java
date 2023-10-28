@@ -1,7 +1,9 @@
 package com.example.listapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -21,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.util.Log;
+import android.app.AlertDialog;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -227,8 +230,33 @@ public class Controller {
 
     public void setupSettingsScreen() {
         webView.saveState(instanceState);
-        activity.setContentView(R.layout.activity_history);
+        activity.setContentView(R.layout.activity_settings);
         currentView = TabWindow.SETTINGS;
+
+        Button clearHistoryButton = (Button) activity.findViewById(R.id.clearHistoryButton);
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
+        clearHistoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertBuilder.setTitle("Clear History");
+                alertBuilder.setMessage("Clearing history is permanent. \nClearing history will reset the current session. \nDo you wish to clear history?");
+                alertBuilder.setCancelable(true);
+                alertBuilder.setPositiveButton("Clear History", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        clearHistory();
+                    }
+                });
+
+                alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                alertBuilder.show();
+            }
+        });
 
         setupTabs();
     }
