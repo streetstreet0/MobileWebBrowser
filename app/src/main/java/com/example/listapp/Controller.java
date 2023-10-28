@@ -238,7 +238,7 @@ public class Controller {
         clearHistoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertBuilder.setTitle("Clear History");
+                alertBuilder.setTitle("Clear History?");
                 alertBuilder.setMessage("Clearing history is permanent. \nClearing history will reset the current session. \nDo you wish to clear history?");
                 alertBuilder.setCancelable(true);
                 alertBuilder.setPositiveButton("Clear History", new DialogInterface.OnClickListener() {
@@ -264,6 +264,7 @@ public class Controller {
     public void clearHistory() {
         pastHistory = new Stack<String>();
         webView.clearHistory();
+        Log.d("CLEAR", "history deleted");
         saveHistory();
     }
 
