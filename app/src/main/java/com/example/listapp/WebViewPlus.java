@@ -18,6 +18,20 @@ public class WebViewPlus extends WebView {
     }
 
     @Override
+    public void clearHistory() {
+        Log.d("TEST", "webview clearing history");
+        super.clearHistory();
+        Log.d("TEST", "webview cleared history");
+    }
+
+    @Override
+    public void destroy() {
+        Log.d("TEST", "webview destroying");
+        super.destroy();
+        Log.d("TEST", "webview destroyed");
+    }
+
+    @Override
     public void invalidate(Rect dirty) {
         if (getContentHeight() > 0 && urlInputText != null) {
             urlInputText.setText(this.getUrl());

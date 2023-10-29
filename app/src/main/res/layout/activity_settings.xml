@@ -22,13 +22,25 @@
             android:id="@+id/clearHistoryButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Clear History"/>
+            android:text="@string/clear_history"/>
 
         <Button
-            android:id="@+id/unkownButton"
+            android:id="@+id/changeHomepageButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TEMP"/>
+            android:text="@string/change_homepage"/>
+
+<!--        <Button-->
+<!--            android:id="@+id/changeThemeButton"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="@string/change_theme"/>-->
+
+        <Button
+            android:id="@+id/clearPermanentDataButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/clear_all"/>
     </LinearLayout>
 
     <LinearLayout
@@ -46,21 +58,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.1"
-            android:text="Browser" />
+            android:text="@string/browser" />
 
         <Button
             android:id="@+id/historyButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.1"
-            android:text="History" />
+            android:text="@string/history" />
 
         <Button
             android:id="@+id/settingsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.1"
-            android:text="Settings" />
+            android:text="@string/settings" />
     </LinearLayout>
 
 

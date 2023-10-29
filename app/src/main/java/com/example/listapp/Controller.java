@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -14,6 +16,7 @@ import android.webkit.ClientCertRequest;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
+import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
@@ -29,17 +32,18 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 public class Controller {
-    Activity activity;
-    Bundle instanceState;
-    Stack<String> history;
-    Stack<String> pastHistory; // used to refer to history before this session
-    String url;
-    String homePage = "https:www.duckduckgo.com";
-    EditText input;
-    WebViewPlus webView;
-    TabWindow currentView;
+    private MainActivity activity;
+    private Bundle instanceState;
+    private Stack<String> history;
+    private Stack<String> pastHistory; // used to refer to history before this session
+    private String url;
+    private final String defaultHomePage = "https:www.duckduckgo.com";
+    private String homePage;
+    private EditText input;
+    private WebViewPlus webView;
+    private TabWindow currentView;
 
-    public Controller(Activity activity, Bundle savedInstanceState){
+    public Controller(MainActivity activity, Bundle savedInstanceState){
         if (savedInstanceState == null) {
             this.instanceState = new Bundle();
         }
@@ -48,6 +52,10 @@ public class Controller {
         }
         pastHistory = new Stack<String>();
         this.activity = activity;
+        this.homePage = defaultHomePage;
+    }
+
+    public void start() {
         setupHomeScreen();
     }
 
@@ -56,8 +64,16 @@ public class Controller {
         return history;
     }
 
+    public String getHomepage() {
+        return homePage;
+    }
+
     public void loadHistory(Stack<String> pastHistory) {
         this.pastHistory = pastHistory;
+    }
+
+    public void loadHomepage(String homePage) {
+        this.homePage = homePage;
     }
 
     private void setupHomeScreen(){
@@ -100,11 +116,9 @@ public class Controller {
             }
         });
 
-        Button button = (Button) this.activity.findViewById(R.id.backButton);
-        button.setOnClickListener((view -> {
-            if (webView.canGoBack()){
-                webView.goBack();
-            }
+        Button homeButton = (Button) this.activity.findViewById(R.id.homeButton);
+        homeButton.setOnClickListener((view -> {
+            webView.loadUrl(homePage);
         }));
     }
 
@@ -175,7 +189,7 @@ public class Controller {
         }
     }
 
-    public void setupTabs() {
+    private void setupTabs() {
         if (currentView != TabWindow.BROSWER) {
             Button browserButton = (Button) activity.findViewById(R.id.webButton);
             browserButton.setOnClickListener(new View.OnClickListener() {
@@ -207,7 +221,7 @@ public class Controller {
         }
     }
 
-    public void setupHistoryScreen() {
+    private void setupHistoryScreen() {
         webView.saveState(instanceState);
         activity.setContentView(R.layout.activity_history);
         currentView = TabWindow.HISTORY;
@@ -228,44 +242,117 @@ public class Controller {
         setupTabs();
     }
 
-    public void setupSettingsScreen() {
+    private void setupSettingsScreen() {
         webView.saveState(instanceState);
         activity.setContentView(R.layout.activity_settings);
         currentView = TabWindow.SETTINGS;
 
         Button clearHistoryButton = (Button) activity.findViewById(R.id.clearHistoryButton);
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder clearHistoryAlertBuilder = new AlertDialog.Builder(activity);
         clearHistoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertBuilder.setTitle("Clear History?");
-                alertBuilder.setMessage("Clearing history is permanent. \nClearing history will reset the current session. \nDo you wish to clear history?");
-                alertBuilder.setCancelable(true);
-                alertBuilder.setPositiveButton("Clear History", new DialogInterface.OnClickListener() {
+                clearHistoryAlertBuilder.setTitle("Clear History?");
+                clearHistoryAlertBuilder.setMessage("Clearing history is permanent. \nClearing history will close the current session.");
+                clearHistoryAlertBuilder.setCancelable(true);
+                clearHistoryAlertBuilder.setPositiveButton("Clear History", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        clearHistory();
+                        clearHistory(false);
                     }
                 });
 
-                alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                clearHistoryAlertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                     }
                 });
-                alertBuilder.show();
+                clearHistoryAlertBuilder.show();
+            }
+        });
+
+        Button changeHomepageButton = (Button) activity.findViewById(R.id.changeHomepageButton);
+        AlertDialog.Builder changeHomepageAlertBuilder = new AlertDialog.Builder(activity);
+        changeHomepageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeHomepageAlertBuilder.setTitle("Change Homepage");
+                final EditText newHomepageInput = new EditText(activity);
+                newHomepageInput.setHint("Type new homepage...");
+                changeHomepageAlertBuilder.setView(newHomepageInput);
+                changeHomepageAlertBuilder.setCancelable(true);
+
+                changeHomepageAlertBuilder.setPositiveButton("Set Homepage", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        changeHomePage(String.valueOf(newHomepageInput.getText()));
+                    }
+                });
+
+                changeHomepageAlertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                changeHomepageAlertBuilder.show();
+            }
+        });
+
+//        Button changeThemeButton = (Button) activity.findViewById(R.id.changeThemeButton);
+//        changeThemeButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                changeTheme();
+//            }
+//        });
+
+        Button clearAllButton = (Button) activity.findViewById(R.id.clearPermanentDataButton);
+        AlertDialog.Builder clearAllAlertBuilder = new AlertDialog.Builder(activity);
+        clearAllButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearAllAlertBuilder.setTitle("Clear Permanent Data?");
+                clearAllAlertBuilder.setMessage("Clearing permanent data will close the current session.");
+                clearAllAlertBuilder.setCancelable(true);
+                clearAllAlertBuilder.setPositiveButton("Clear Permanent Data", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        homePage = defaultHomePage;
+                        clearHistory(true);
+                    }
+                });
+
+                clearAllAlertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                clearAllAlertBuilder.show();
             }
         });
 
         setupTabs();
     }
 
-    public void clearHistory() {
+    public void clearHistory(Boolean silent) {
         pastHistory = new Stack<String>();
+        history = new Stack<String>();
         webView.clearHistory();
+        webView.destroy();
         Log.d("CLEAR", "history deleted");
-        saveHistory();
+        if (!silent) {
+            Toast.makeText(activity, activity.getString(R.string.history_cleared), Toast.LENGTH_LONG).show();
+        }
+        activity.saveData();
+        activity.finish();
+    }
+
+    public void changeHomePage(String url) {
+        homePage = parseUrl(url);
+        Toast.makeText(activity, activity.getString(R.string.homepage_set), Toast.LENGTH_LONG).show();
     }
 
     public void saveHistory() {
@@ -283,4 +370,12 @@ public class Controller {
         }
         Log.d("SAVE", "history saved");
     }
+
+//    public void changeTheme() {
+//        Resources.Theme currentTheme = activity.getTheme();
+//        Log.d("TEST", "Theme was: " + String.valueOf(currentTheme));
+//        activity.setTheme(R.style.Theme_ThemeTwo);
+//        Log.d("TEST", "Theme Changed to: " + String.valueOf(activity.getTheme()));
+//        Log.d("TEST", "Theme Should be: " + String.valueOf(activity.(R.style.Theme_ThemeTwo));
+//    }
 }

@@ -2,4 +2,14 @@
     <string name="app_name">Web App</string>
     <string name="url">Type a url..</string>
     <string name="shut_down">App shutting down</string>
+    <string name="history_cleared">History Cleared\nApp shutting down</string>
+    <string name="clear_history">Clear History</string>
+    <string name="change_homepage">Change Homepage</string>
+    <string name="change_theme">Change Theme</string>
+    <string name="browser">Browser</string>
+    <string name="history">History</string>
+    <string name="settings">Settings</string>
+    <string name="home">Home</string>
+    <string name="homepage_set">Homepage Changed</string>
+    <string name="clear_all">Clear Permanent Data</string>
 </resources>
