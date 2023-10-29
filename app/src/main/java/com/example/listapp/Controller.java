@@ -320,6 +320,7 @@ public class Controller {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         homePage = defaultHomePage;
+                        Toast.makeText(activity, activity.getString(R.string.data_cleared), Toast.LENGTH_LONG).show();
                         clearHistory(true);
                     }
                 });

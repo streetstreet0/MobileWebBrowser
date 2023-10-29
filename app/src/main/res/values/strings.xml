@@ -3,6 +3,7 @@
     <string name="url">Type a url..</string>
     <string name="shut_down">App shutting down</string>
     <string name="history_cleared">History Cleared\nApp shutting down</string>
+    <string name="data_cleared">Permanent Data Cleared\nApp shutting down</string>
     <string name="clear_history">Clear History</string>
     <string name="change_homepage">Change Homepage</string>
     <string name="change_theme">Change Theme</string>
